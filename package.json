@@ -1,49 +1,13 @@
-import TelegramBot from "node-telegram-bot-api";
-import OpenAI from "openai";
-
-const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const MY_USER_ID = process.env.MY_USER_ID;
-
-const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-
-bot.on("message", async (msg) => {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  const text = msg.text ?? "";
-
-  // 🔒 Risponde solo a te
-  if (String(userId) !== String(MY_USER_ID)) {
-    return;
+{
+  "name": "telegram-ai-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "openai": "^4.0.0"
   }
-
-  if (!text.trim()) return;
-
-  bot.sendChatAction(chatId, "typing");
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "Sei un assistente tecnico esperto che aiuta Marco a creare app, scrivere codice e risolvere problemi."
-        },
-        {
-          role: "user",
-          content: text
-        }
-      ]
-    });
-
-    const reply = response.choices[0].message.content;
-    await bot.sendMessage(chatId, reply);
-
-  } catch (error) {
-    console.error(error);
-    await bot.sendMessage(chatId, "Errore nel collegamento a ChatGPT.");
-  }
-});
-
-console.log("Bot attivo 🚀");
+}
